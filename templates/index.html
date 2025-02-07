@@ -1,5 +1,6 @@
 <!-- Copyright (c) 2025 Joseph Moramarco | MIT License -->
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,46 +10,77 @@
 </head>
 <body>
     <h1>Word Bridge Game</h1>
-    <p>Enter two 5-letter words to find the shortest transformation path.</p>
+    <p>Transform the start word into the end word by changing one letter at a time.</p>
+    
+    <div>
+        <p><strong>Start Word:</strong> <span id="startWord">...</span></p>
+        <p><strong>End Word:</strong> <span id="endWord">...</span></p>
+    </div>
     
     <form id="wordBridgeForm">
-        <label for="start">Start Word:</label>
-        <input type="text" id="start" name="start" maxlength="5" required>
-        <br>
-        <label for="end">End Word:</label>
-        <input type="text" id="end" name="end" maxlength="5" required>
-        <br>
-        <button type="submit">Find Path</button>
+        <label for="nextWord">Enter Next Word:</label>
+        <input type="text" id="nextWord" name="nextWord" maxlength="5" required>
+        <button type="submit">Submit</button>
     </form>
     
-    <h2>Result:</h2>
-    <p id="result"></p>
+    <h2>Current Path:</h2>
+    <ul id="pathList"></ul>
+    
+    <h2>Error Messages:</h2>
+    <p id="errorMessage" style="color: red;"></p>
+    
+    <h2>Game Status:</h2>
+    <p id="gameStatus" style="color: green;"></p>
     
     <script>
-        $(document).ready(function() {
-            $("#wordBridgeForm").submit(function(event) {
-                event.preventDefault();
-                let startWord = $("#start").val().toLowerCase();
-                let endWord = $("#end").val().toLowerCase();
-                
-                $.ajax({
-                    url: "/solve",
-                    type: "POST",
-                    contentType: "application/json",
-                    data: JSON.stringify({ start: startWord, end: endWord }),
-                    success: function(response) {
-                        if (response.error) {
-                            $("#result").text("Error: " + response.error);
-                        } else {
-                            $("#result").text("Path: " + response.path.join(" → "));
-                        }
-                    },
-                    error: function() {
-                        $("#result").text("An error occurred. Please try again.");
-                    }
+        let startWord = "";
+        let endWord = "";
+        let currentPath = [];
+        
+        function fetchNewGame() {
+            fetch('/new_game')
+                .then(response => response.json())
+                .then(data => {
+                    startWord = data.start;
+                    endWord = data.end;
+                    currentPath = [startWord];
+                    document.getElementById("startWord").textContent = startWord;
+                    document.getElementById("endWord").textContent = endWord;
+                    document.getElementById("pathList").innerHTML = `<li>${startWord}</li>`;
+                    document.getElementById("gameStatus").textContent = "";
                 });
+        }
+        
+        document.getElementById("wordBridgeForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let nextWord = document.getElementById("nextWord").value.toLowerCase();
+            
+            fetch('/check_response', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_path: [...currentPath, nextWord],
+                    start: startWord,
+                    end: endWord
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("errorMessage").textContent = data.error;
+                } else {
+                    document.getElementById("errorMessage").textContent = "";
+                    currentPath.push(nextWord);
+                    document.getElementById("pathList").innerHTML += `<li>${nextWord}</li>`;
+                    
+                    if (nextWord === endWord) {
+                        document.getElementById("gameStatus").textContent = "Congratulations! You completed the path.";
+                    }
+                }
             });
         });
+        
+        fetchNewGame();
     </script>
 </body>
 </html>
