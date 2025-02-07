@@ -1,3 +1,7 @@
+# Copyright (c) 2025 Joseph Moramarco
+# Licensed under the MIT License.
+# See the LICENSE file in the project root for more details.
+
 from collections import deque
 
 import nltk  # type: ignore
