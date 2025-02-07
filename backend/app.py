@@ -3,8 +3,8 @@
 # See the LICENSE file in the project root for more details.
 import logging
 
-from flask import Flask, jsonify, render_template, request
-
+from flask import Flask, jsonify, request, send_from_directory
+from flask_cors import CORS
 from word_bridge.solver import (
     find_shortest_path,
     generate_neighbors,
@@ -15,11 +15,17 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Flask App
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route("/")
-def index():
-    return render_template("index.html")
+def serve_react():
+    return send_from_directory("../frontend/build", "index.html")
+
+
+@app.route("/static/<path:path>")
+def serve_static(path):
+    return send_from_directory("../frontend/build/static", path)
 
 
 @app.route("/solve", methods=["POST"])
@@ -67,4 +73,4 @@ def new_game():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
