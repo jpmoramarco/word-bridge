@@ -1,11 +1,12 @@
+# Copyright (c) 2025 Joseph Moramarco
+# Licensed under the MIT License.
+# See the LICENSE file in the project root for more details.
+import random
 from collections import deque
+from typing import List, Optional
 
-import nltk  # type: ignore
-from nltk.corpus import words  # type: ignore
-
-nltk.data.path.append("data/")
-
-word_set = {word.lower() for word in words.words() if len(word) == 5}
+with open("data/all_words.txt") as f:
+    word_set = {line.strip().lower() for line in f if len(line.strip()) == 5}
 
 
 def generate_neighbors(word):
@@ -22,7 +23,7 @@ def generate_neighbors(word):
     return neighbors
 
 
-def word_bridge(start, end):
+def find_shortest_path(start, end) -> Optional[List[str]]:
     """Find the shortest path from start word to end word using a word ladder approach."""
     if start not in word_set or end not in word_set:
         return None
@@ -46,3 +47,17 @@ def word_bridge(start, end):
                 queue.append((neighbor, path + [neighbor]))
 
     return None  # No path found
+
+
+def get_random_word_pair():
+    """Generate two random words that have a valid word bridge path between them."""
+    valid_words = list(word_set)
+    random.shuffle(valid_words)
+
+    for start in valid_words:
+        for end in valid_words:
+            if start != end:
+                path = find_shortest_path(start, end)
+                if path:
+                    return start, end, path
+    return None, None, None  # If no valid pair is found

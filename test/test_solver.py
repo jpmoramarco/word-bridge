@@ -1,4 +1,8 @@
-from word_bridge.solver import generate_neighbors, word_bridge
+# Copyright (c) 2025 Joseph Moramarco
+# Licensed under the MIT License.
+# See the LICENSE file in the project root for more details.
+
+from word_bridge.solver import find_shortest_path, generate_neighbors
 
 
 def test_generate_neighbors():
@@ -12,11 +16,11 @@ def test_generate_neighbors():
 
 def test_word_bridge():
     # Test valid transformations
-    assert word_bridge("stone", "store") == ["stone", "store"]
-    assert word_bridge("stone", "storm") == ["stone", "store", "storm"]
+    assert find_shortest_path("stone", "store") == ["stone", "store"]
+    assert find_shortest_path("stone", "storm") == ["stone", "store", "storm"]
 
     # Test when no path exists
-    assert word_bridge("stone", "zzzzz") is None
+    assert find_shortest_path("stone", "zzzzz") is None
 
     # Test when start and end are the same
-    assert word_bridge("stone", "stone") == ["stone"]
+    assert find_shortest_path("stone", "stone") == ["stone"]
