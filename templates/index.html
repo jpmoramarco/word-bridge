@@ -1,10 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Bridge Game</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <h1>Welcome to Word Bridge</h1>
-    <p>Bridge These Two Words!</p>
+    <h1>Word Bridge Game</h1>
+    <p>Enter two 5-letter words to find the shortest transformation path.</p>
+    
+    <form id="wordBridgeForm">
+        <label for="start">Start Word:</label>
+        <input type="text" id="start" name="start" maxlength="5" required>
+        <br>
+        <label for="end">End Word:</label>
+        <input type="text" id="end" name="end" maxlength="5" required>
+        <br>
+        <button type="submit">Find Path</button>
+    </form>
+    
+    <h2>Result:</h2>
+    <p id="result"></p>
+    
+    <script>
+        $(document).ready(function() {
+            $("#wordBridgeForm").submit(function(event) {
+                event.preventDefault();
+                let startWord = $("#start").val().toLowerCase();
+                let endWord = $("#end").val().toLowerCase();
+                
+                $.ajax({
+                    url: "/solve",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ start: startWord, end: endWord }),
+                    success: function(response) {
+                        if (response.error) {
+                            $("#result").text("Error: " + response.error);
+                        } else {
+                            $("#result").text("Path: " + response.path.join(" → "));
+                        }
+                    },
+                    error: function() {
+                        $("#result").text("An error occurred. Please try again.");
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

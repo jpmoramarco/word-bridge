@@ -1,0 +1,17 @@
+[flake8]
+# B - Lint checks for likely bugs and design problems
+# C - McCabe complexity errors
+# E - All E class violations are "errors" reported by pycodestyle
+# F - All F class violations are reported by pyflakes
+# W - All W class violations are "warnings" reported by pycodestyle
+# T4 - Typing related errors
+select = B,C,E,F,W,T4
+
+# E203 whitespace before ':'
+# E266 - Too many leading '#' for block comment
+# W503 Line break occurred before a binary operator; this goes against PEP 8 recommended style
+ignore = E203, E266, W503
+
+# Directories to exclude
+exclude = .git,__pycache__,dist,build,venv,.tox,*.pyc,build,develop-eggs,downloads,eggs
+max-line-length = 120
