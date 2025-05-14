@@ -65,6 +65,6 @@ def get_random_word_pair():
         for end in valid_words:
             if start != end:
                 path = find_shortest_path(start, end, common_only=True)
-                if path and len(path) < 6 and len(path) > 2:
+                if path and len(path) < 7 and len(path) > 3:
                     return start, end, path
     return None, None, None  # If no valid pair is found
