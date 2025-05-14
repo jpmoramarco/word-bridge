@@ -5,7 +5,6 @@ abbey
 abbot
 abhor
 abide
-abled
 abode
 abort
 about
