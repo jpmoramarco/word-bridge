@@ -64,14 +64,14 @@ def check_response():
     optimal_path = find_shortest_path(start, end)
 
     if not optimal_path:
-        return jsonify({"error": "Invalid start or end word."})
+        return jsonify({"error": "Invalid start or end word"})
 
     if user_path[-1] == end:
         return jsonify({"user_path": user_path, "optimal_path": optimal_path})
 
     last_word = user_path[-1]
     if last_word not in generate_neighbors(user_path[-2]):
-        return jsonify({"error": "Invalid word entered."})
+        return jsonify({"error": "Invalid word entered"})
 
     return jsonify({"message": "Valid move, continue playing."})
 
