@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 # See the LICENSE file in the project root for more details.
 import logging
+import os
 
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
@@ -13,24 +14,32 @@ from word_bridge.solver import (
 
 logging.basicConfig(level=logging.DEBUG)
 
-# Flask App
-app = Flask(__name__)
+app = Flask(__name__, static_folder=None)
 CORS(app)
 
 
 @app.route("/")
 def serve_react():
-    return send_from_directory("../frontend/build", "index.html")
+    build_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../frontend/build")
+    )
+    return send_from_directory(build_dir, "index.html")
 
 
 @app.route("/static/<path:path>")
 def serve_static(path):
-    return send_from_directory("../frontend/build/static", path)
+    build_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../frontend/build")
+    )
+
+    return send_from_directory(os.path.join(build_dir, "static"), path)
 
 
 @app.route("/solve", methods=["POST"])
 def solve():
     data = request.json
+    if data is None:
+        return jsonify({"error": "request data is None"})
     start = data.get("start", "").lower()
     end = data.get("end", "").lower()
 
@@ -47,6 +56,8 @@ def solve():
 @app.route("/check_response", methods=["POST"])
 def check_response():
     data = request.json
+    if data is None:
+        return jsonify({"error": "request data is None"})
     user_path = data.get("user_path", [])
     start = data.get("start", "").lower()
     end = data.get("end", "").lower()

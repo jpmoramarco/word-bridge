@@ -5,14 +5,21 @@ import random
 from collections import deque
 from typing import List, Optional
 
+with open("data/common_words.txt") as f:
+    common_words = {line.strip().lower() for line in f}
+    print(len(common_words))
+
 with open("data/all_words.txt") as f:
-    word_set = {line.strip().lower() for line in f if len(line.strip()) == 5}
+    all_words = {line.strip().lower() for line in f}
+    all_words = common_words | all_words
+    print(len(all_words))
 
 
-def generate_neighbors(word):
+def generate_neighbors(word, common_only: bool = False):
     """Generate valid words that are one letter different from the given word."""
     neighbors = set()
     alphabet = "abcdefghijklmnopqrstuvwxyz"
+    word_set = common_words if common_only else all_words
 
     for i in range(len(word)):
         for letter in alphabet:
@@ -23,9 +30,9 @@ def generate_neighbors(word):
     return neighbors
 
 
-def find_shortest_path(start, end) -> Optional[List[str]]:
+def find_shortest_path(start, end, common_only: bool = False) -> Optional[List[str]]:
     """Find the shortest path from start word to end word using a word ladder approach."""
-    if start not in word_set or end not in word_set:
+    if start not in all_words or end not in all_words:
         return None
 
     queue = deque([(start, [start])])  # (current_word, path_so_far)
@@ -42,7 +49,7 @@ def find_shortest_path(start, end) -> Optional[List[str]]:
 
         visited.add(current_word)
 
-        for neighbor in generate_neighbors(current_word):
+        for neighbor in generate_neighbors(current_word, common_only):
             if neighbor not in visited:
                 queue.append((neighbor, path + [neighbor]))
 
@@ -51,13 +58,13 @@ def find_shortest_path(start, end) -> Optional[List[str]]:
 
 def get_random_word_pair():
     """Generate two random words that have a valid word bridge path between them."""
-    valid_words = list(word_set)
+    valid_words = list(common_words)
     random.shuffle(valid_words)
 
     for start in valid_words:
         for end in valid_words:
             if start != end:
-                path = find_shortest_path(start, end)
-                if path:
+                path = find_shortest_path(start, end, common_only=True)
+                if path and len(path) < 6 and len(path) > 2:
                     return start, end, path
     return None, None, None  # If no valid pair is found
